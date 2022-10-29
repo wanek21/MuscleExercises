@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "804318932004",
+    "project_id": "muscleexercises-d59e6",
+    "storage_bucket": "muscleexercises-d59e6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:804318932004:android:58d23f68b546ff0883bcb1",
+        "android_client_info": {
+          "package_name": "com.example.muscleexercises"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "804318932004-ac50m3q5ablvumi02eein2dh916skaou.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD71tfCW5mhkP3yGtkFBTMySYdZSi2P0JA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "804318932004-ac50m3q5ablvumi02eein2dh916skaou.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
