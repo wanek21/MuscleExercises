@@ -25,36 +25,31 @@ class MainActivity : AppCompatActivity() {
         getSharedPreferences(Data.preferences, Context.MODE_PRIVATE)
     }
 
-    val isEmulator: Boolean by lazy {
-        // Android SDK emulator
-        return@lazy ((Build.FINGERPRINT.startsWith("google/sdk_gphone_")
-                && Build.FINGERPRINT.endsWith(":user/release-keys")
-                && Build.MANUFACTURER == "Google" && Build.PRODUCT.startsWith("sdk_gphone_") && Build.BRAND == "google"
-                && Build.MODEL.startsWith("sdk_gphone_"))
-                //
-                || Build.FINGERPRINT.startsWith("generic")
-                || Build.FINGERPRINT.startsWith("unknown")
-                || Build.MODEL.contains("google_sdk")
-                || Build.MODEL.contains("Emulator")
-                || Build.MODEL.contains("Android SDK built for x86")
-                //bluestacks
-                || "QC_Reference_Phone" == Build.BOARD && !"Xiaomi".equals(
-            Build.MANUFACTURER,
-            ignoreCase = true
-        ) //bluestacks
-                || Build.MANUFACTURER.contains("Genymotion")
-                || Build.HOST.startsWith("Build") //MSI App Player
-                || Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic")
-                || Build.PRODUCT == "google_sdk")
-                // another Android SDK emulator check
-                //|| SystemProperties.getProp("ro.kernel.qemu") == "1")
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         checkUrlAfterSplash()
+    }
+
+    private fun isEmulator(): Boolean {
+        return (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic")
+                || Build.FINGERPRINT.startsWith("generic")
+                || Build.FINGERPRINT.startsWith("unknown")
+                || Build.HARDWARE.contains("goldfish")
+                || Build.HARDWARE.contains("ranchu")
+                || Build.MODEL.contains("google_sdk")
+                || Build.MODEL.contains("Emulator")
+                || Build.MODEL.contains("Android SDK built for x86")
+                || Build.MANUFACTURER.contains("Genymotion")
+                || Build.PRODUCT.contains("sdk_google")
+                || Build.PRODUCT.contains("google_sdk")
+                || Build.PRODUCT.contains("sdk")
+                || Build.PRODUCT.contains("sdk_x86")
+                || Build.PRODUCT.contains("sdk_gphone64_arm64")
+                || Build.PRODUCT.contains("vbox86p")
+                || Build.PRODUCT.contains("emulator")
+                || Build.PRODUCT.contains("simulator"))
     }
 
     private fun checkUrl() {
@@ -87,20 +82,18 @@ class MainActivity : AppCompatActivity() {
 
     // в активити с заглушкой
     private fun toNoUrlActivity() {
-        startActivity(Intent(this, NoUrlActivity::class.java))
+        startActivity(Intent(this, MuscleGroupsActivity::class.java))
         finish()
     }
 
     private fun getFirebaseUrl() {
         val url = remoteConfig.getString("url")
-        log(url)
-        log(Build.MODEL)
 
         // проверяем условия для перехода в web view
         if(url.isNotEmpty()
-            && !Build.MODEL.contains("google")
+            && !(Build.MODEL.contains("google", true) || Build.MODEL.contains("pixel", true))
             && haveSimCart()
-            && !isEmulator) {
+            && !isEmulator()) {
             sharedPreferences.edit {
                 putString(Data.url, url)
                 commit()
@@ -114,16 +107,23 @@ class MainActivity : AppCompatActivity() {
         return tm.simState != TelephonyManager.SIM_STATE_ABSENT
     }
 
+    // показываем сплеш анимацию при запуске и после проверяем наличие ссылки
     private fun checkUrlAfterSplash() {
         val splashGroup = findViewById<Group>(R.id.splash)
         val mainGroup = findViewById<Group>(R.id.mainContent)
-        Handler().postDelayed({ // This method will be executed once the timer is over
-            // Start your app main activity
-            runOnUiThread {
-                splashGroup.visibility = View.GONE
-                mainGroup.visibility = View.VISIBLE
-            }
+        if(Build.VERSION.SDK_INT < 31) {
+            Handler().postDelayed({ // This method will be executed once the timer is over
+                // Start your app main activity
+                runOnUiThread {
+                    splashGroup.visibility = View.GONE
+                    mainGroup.visibility = View.VISIBLE
+                }
+                checkUrl()
+            }, 1500)
+        } else {
+            splashGroup.visibility = View.GONE
+            mainGroup.visibility = View.VISIBLE
             checkUrl()
-        }, 1500)
+        }
     }
 }
